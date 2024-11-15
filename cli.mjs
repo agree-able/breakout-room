@@ -14,8 +14,6 @@ async function run () {
   room.on('peerEntered', (peerKey) => console.log('peer entered the room', peerKey))
   room.on('peerLeft', async (peerKey) => {
     console.log('peer left the room', peerKey)
-    await room.exit()
-    process.exit(0)
   })
 
   room.on('message', async (m) => {
@@ -24,14 +22,6 @@ async function run () {
     console.log('Transcript:', transcript)
   })
 
-  let inShutdown = false
-  const shutdown = async () => {
-    if (inShutdown) return
-    inShutdown = true
-    await room.exit()
-    process.exit(0)
-  }
-  process.on('SIGINT', shutdown)
-  process.on('SIGTERM', shutdown)
+  room.installSIGHandlers()
 }
 run()

@@ -64,6 +64,7 @@ export class RoomManager extends EventEmitter {
     process.on('SIGINT', cleanup)
     process.on('SIGTERM', cleanup)
   }
+
   isClosingDown () {
     return this.closingDown
   }
@@ -184,6 +185,22 @@ export class BreakoutRoom extends EventEmitter {
     if (this.internalManaged.corestore) await this.corestore.close()
     this.emit('roomClosed')
     this.removeAllListeners() // clean up listeners
+  }
+
+  async installSIGHandlers () {
+    this.closingDown = false
+    const cleanup = async () => {
+      if (this.closingDown) return
+      this.closingDown = true
+      await this.exit()
+      process.exit(0)
+    }
+    process.on('SIGINT', cleanup)
+    process.on('SIGTERM', cleanup)
+  }
+
+  isClosingDown () {
+    return this.closingDown
   }
 }
 

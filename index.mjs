@@ -47,6 +47,21 @@ export class RoomManager {
     if (this.internalManaged.swarm) await this.swarm.destroy()
     if (this.internalManaged.corestere) await this.corestore.close()
   }
+
+  async installSIGHandlers () {
+    this.closingDown = false
+    const cleanup = async () => {
+      this.closingDown = true
+      await this.cleanup()
+      process.exit(0)
+    }
+    process.on('SIGINT', cleanup)
+    process.on('SIGTERM', cleanup)
+  }
+
+  isClosingDown () {
+    return this.closingDown
+  }
 }
 
 export class BreakoutRoom extends EventEmitter {

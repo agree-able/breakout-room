@@ -6,8 +6,9 @@ import RAM from 'random-access-memory'
 import z32 from 'z32'
 import { EventEmitter } from 'events'
 
-export class RoomManager {
+export class RoomManager extends EventEmitter {
   constructor (opts = {}) {
+    super()
     this.internalManaged = { corestore: false, swarm: false, pairing: false }
     if (opts.corestore) this.corestore = opts.corestore
     else {
@@ -33,7 +34,12 @@ export class RoomManager {
     baseOpts.roomId = roomId
     const room = new BreakoutRoom(baseOpts)
     this.rooms[roomId] = room
-    room.on('roomClosed', () => delete this.rooms[roomId])
+    room.on('roomClosed', () => {
+      delete this.rooms[roomId]
+      if (this.closingDown) return
+      if (Object.keys(this.rooms).length > 0) return
+      process.nextTick(() => this.emit('lastRoomClosed'))
+    })
     return room
   }
 
@@ -58,7 +64,6 @@ export class RoomManager {
     process.on('SIGINT', cleanup)
     process.on('SIGTERM', cleanup)
   }
-
   isClosingDown () {
     return this.closingDown
   }

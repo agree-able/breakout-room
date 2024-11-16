@@ -6,7 +6,22 @@ import RAM from 'random-access-memory'
 import z32 from 'z32'
 import { EventEmitter } from 'events'
 
+/**
+ * @typedef {Object} RoomManagerOptions
+ * @property {Corestore} [corestore] - Optional preconfigured Corestore instance
+ * @property {string} [storageDir] - Optional storage directory path
+ * @property {Hyperswarm} [swarm] - Optional preconfigured Hyperswarm instance
+ * @property {BlindPairing} [pairing] - Optional preconfigured BlindPairing instance
+ */
+/**
+ * Manages multiple breakout rooms and their resources
+ * @extends EventEmitter
+ */
 export class RoomManager extends EventEmitter {
+  /**
+   * Creates a new RoomManager instance
+   * @param {RoomManagerOptions} [opts={}] - Configuration options
+   */
   constructor (opts = {}) {
     super()
     this.internalManaged = { corestore: false, swarm: false, pairing: false }
@@ -21,11 +36,23 @@ export class RoomManager extends EventEmitter {
     this.rooms = {}
   }
 
+  /**
+   * Gets configuration options for a new room
+   * @param {string} roomId - Unique room identifier
+   * @returns {Object} Room configuration options
+   */
   getRoomOptions (roomId) {
     const corestore = roomId ? this.corestore.namespace(roomId) : this.corestore
     return { corestore, swarm: this.swarm, pairing: this.pairing }
   }
 
+  /**
+   * Creates a new breakout room
+   * @param {Object} [opts={}] - Room configuration options
+   * @param {string} [opts.invite] - Optional invite code
+   * @param {Object} [opts.metadata] - Optional room metadata
+   * @returns {BreakoutRoom} New room instance
+   */
   createRoom (opts = {}) {
     const roomId = generateRoomId()
     const baseOpts = this.getRoomOptions(roomId)
@@ -70,7 +97,26 @@ export class RoomManager extends EventEmitter {
   }
 }
 
+/**
+ * @typedef {Object} BreakoutRoomOptions
+ * @property {string} [roomId] - Optional room identifier
+ * @property {Corestore} [corestore] - Optional Corestore instance
+ * @property {string} [storageDir] - Optional storage directory
+ * @property {Hyperswarm} [swarm] - Optional Hyperswarm instance
+ * @property {BlindPairing} [pairing] - Optional BlindPairing instance
+ * @property {string} [invite] - Optional invite code
+ * @property {Object} [metadata] - Optional room metadata
+ */
+
+/**
+ * Represents a single breakout room for peer-to-peer communication
+ * @extends EventEmitter
+ */
 export class BreakoutRoom extends EventEmitter {
+  /**
+   * Creates a new BreakoutRoom instance
+   * @param {BreakoutRoomOptions} [opts={}] - Room configuration options
+   */
   constructor (opts = {}) {
     super()
     this.roomId = opts.roomId || generateRoomId()
@@ -85,10 +131,13 @@ export class BreakoutRoom extends EventEmitter {
     this.pairing = opts.pairing ? opts.pairing : (this.internalManaged.pairing = true, new BlindPairing(this.swarm))
     this.autobase = new Autobase(this.corestore, null, { apply, open, valueEncoding: 'json' })
     if (opts.invite) this.invite = z32.decode(opts.invite)
-    if (opts.roomCount) this.roomCount = opts.roomCount
     this.metadata = opts.metadata || {}
   }
 
+  /**
+   * Initializes the room and sets up event handlers
+   * @returns {Promise<string|void>} Returns invite code if room is host
+   */
   async ready () {
     await this.autobase.ready()
     // some hacky stuff to only emit remote messages, and only emit once
@@ -133,6 +182,11 @@ export class BreakoutRoom extends EventEmitter {
     }
   }
 
+  /**
+   * Sends a message to the room
+   * @param {string} data - Message content
+   * @returns {Promise<void>}
+   */
   async message (data) {
     await this.autobase.append({
       when: Date.now(),
@@ -162,6 +216,10 @@ export class BreakoutRoom extends EventEmitter {
     this.emit('peerEntered', z32.encode(key))
   }
 
+  /**
+   * Retrieves the complete room message history
+   * @returns {Promise<Array>} Array of message entries
+   */
   async getTranscript () {
     const transcript = []
     await this.autobase.update()
@@ -205,11 +263,23 @@ export class BreakoutRoom extends EventEmitter {
 }
 
 // create the view
+/**
+ * Opens the view store
+ * @param {Object} store - Storage instance
+ * @returns {Promise<Object>} View store instance
+ */
 function open (store) {
   return store.get({ name: 'view', valueEncoding: 'json' })
 }
 
 // use apply to handle to updates
+/**
+ * Applies updates to the view
+ * @param {Array} nodes - Array of nodes to process
+ * @param {Object} view - View instance
+ * @param {Object} base - Base instance
+ * @returns {Promise<void>}
+ */
 async function apply (nodes, view, base) {
   for (const { value } of nodes) {
     if (value.addWriter) {
@@ -221,6 +291,10 @@ async function apply (nodes, view, base) {
   }
 }
 
+/**
+ * Generates a unique room identifier
+ * @returns {string} Unique room ID combining timestamp and random string
+ */
 function generateRoomId () {
   const timestamp = Date.now().toString(36) // Base36 timestamp
   const random = Math.random().toString(36).substr(2, 5) // 5 random chars

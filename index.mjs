@@ -1,11 +1,3 @@
-/**
- * @typedef {Object} RoomManagerOptions
- * @property {Corestore} [corestore] - Optional preconfigured Corestore instance
- * @property {string} [storageDir] - Optional storage directory path
- * @property {Hyperswarm} [swarm] - Optional preconfigured Hyperswarm instance
- * @property {BlindPairing} [pairing] - Optional preconfigured BlindPairing instance
- */
-
 import Autobase from 'autobase'
 import BlindPairing from 'blind-pairing'
 import Corestore from 'corestore'
@@ -15,6 +7,13 @@ import z32 from 'z32'
 import { EventEmitter } from 'events'
 
 /**
+ * @typedef {Object} RoomManagerOptions
+ * @property {Corestore} [corestore] - Optional preconfigured Corestore instance
+ * @property {string} [storageDir] - Optional storage directory path
+ * @property {Hyperswarm} [swarm] - Optional preconfigured Hyperswarm instance
+ * @property {BlindPairing} [pairing] - Optional preconfigured BlindPairing instance
+ */
+/**
  * Manages multiple breakout rooms and their resources
  * @extends EventEmitter
  */
@@ -22,10 +21,6 @@ export class RoomManager extends EventEmitter {
   /**
    * Creates a new RoomManager instance
    * @param {RoomManagerOptions} [opts={}] - Configuration options
-   */
-  /**
-   * Creates a new BreakoutRoom instance
-   * @param {BreakoutRoomOptions} [opts={}] - Room configuration options
    */
   constructor (opts = {}) {
     super()
@@ -110,7 +105,6 @@ export class RoomManager extends EventEmitter {
  * @property {Hyperswarm} [swarm] - Optional Hyperswarm instance
  * @property {BlindPairing} [pairing] - Optional BlindPairing instance
  * @property {string} [invite] - Optional invite code
- * @property {number} [roomCount] - Optional room count
  * @property {Object} [metadata] - Optional room metadata
  */
 
@@ -119,6 +113,10 @@ export class RoomManager extends EventEmitter {
  * @extends EventEmitter
  */
 export class BreakoutRoom extends EventEmitter {
+  /**
+   * Creates a new BreakoutRoom instance
+   * @param {BreakoutRoomOptions} [opts={}] - Room configuration options
+   */
   constructor (opts = {}) {
     super()
     this.roomId = opts.roomId || generateRoomId()
@@ -133,7 +131,6 @@ export class BreakoutRoom extends EventEmitter {
     this.pairing = opts.pairing ? opts.pairing : (this.internalManaged.pairing = true, new BlindPairing(this.swarm))
     this.autobase = new Autobase(this.corestore, null, { apply, open, valueEncoding: 'json' })
     if (opts.invite) this.invite = z32.decode(opts.invite)
-    if (opts.roomCount) this.roomCount = opts.roomCount
     this.metadata = opts.metadata || {}
   }
 

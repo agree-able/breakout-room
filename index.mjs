@@ -1,3 +1,4 @@
+import { loadAgreement, host, z } from 'agreeable-peer'
 import Autobase from 'autobase'
 import BlindPairing from 'blind-pairing'
 import Corestore from 'corestore'
@@ -5,6 +6,7 @@ import Hyperswarm from 'hyperswarm'
 import RAM from 'random-access-memory'
 import z32 from 'z32'
 import { EventEmitter } from 'events'
+import { NewRoom } from './agreement.mjs'
 
 /**
  * @typedef {Object} RoomManagerOptions
@@ -67,7 +69,23 @@ export class RoomManager extends EventEmitter {
       if (Object.keys(this.rooms).length > 0) return
       process.nextTick(() => this.emit('lastRoomClosed'))
     })
+    process.nextTick(() => this.emit('newRoom', room))
     return room
+  }
+
+  async createReadyRoom (opts = {}) {
+    const room = this.createRoom(opts)
+    const invite = await room.ready()
+    process.nextTick(() => this.emit('readyRoom', room))
+    return invite
+  }
+
+  async startAgreeable (seed) {
+    /** @type { z.infer<NewRoom> } newRoom */
+    const newRoom = async () => this.createReadyRoom()
+    const api = { newRoom }
+    const opts = { seed } // in the future we should make sure that agreeable and our hyperswarm use the same dht
+    return await host(await loadAgreement('./agreement.mjs', import.meta.url), api, opts)
   }
 
   async cleanup () {
@@ -132,6 +150,7 @@ export class BreakoutRoom extends EventEmitter {
     this.autobase = new Autobase(this.corestore, null, { apply, open, valueEncoding: 'json' })
     if (opts.invite) this.invite = z32.decode(opts.invite)
     this.metadata = opts.metadata || {}
+    this.initialized = false
   }
 
   /**
@@ -139,6 +158,8 @@ export class BreakoutRoom extends EventEmitter {
    * @returns {Promise<string|void>} Returns invite code if room is host
    */
   async ready () {
+    if (this.initialized) return this.invite
+    this.initialized = true
     await this.autobase.ready()
     // some hacky stuff to only emit remote messages, and only emit once
     this.lastEmitMessageLength = 0
@@ -171,12 +192,14 @@ export class BreakoutRoom extends EventEmitter {
         onadd: (candidate) => this._onAddMember(publicKey, candidate)
       })
       await member.flushed()
+      this.invite = invite
       return z32.encode(invite)
     }
   }
 
   getRoomInfo () {
     return {
+      invite: z32.encode(this.invite),
       roomId: this.roomId,
       metadata: this.metadata
     }

@@ -1,4 +1,9 @@
 import { z, addRoute } from 'agreeable'
+const Expectations = z.object({
+  reason: z.string().describe('the reason for the room'),
+  rules: z.string().describe('rules for the room'),
+})
+export const RoomExpectiations = z.function().args().returns(z.promise(Expectations))
 export const NewRoom = z.function().args().returns(z.promise(z.string().describe('a z32 encoded room invite')))
 const api = {
   role: 'roommanager',

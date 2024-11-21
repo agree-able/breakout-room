@@ -1,4 +1,4 @@
-import { loadAgreement, host, z } from 'agreeable-peer'
+import { loadAgreement, host, z } from '@agree-able/rpc'
 import Autobase from 'autobase'
 import BlindPairing from 'blind-pairing'
 import Corestore from 'corestore'
@@ -80,10 +80,11 @@ export class RoomManager extends EventEmitter {
     return invite
   }
 
-  async startAgreeable (seed) {
+  async startAgreeable (seed, expectations) {
     /** @type { z.infer<NewRoom> } newRoom */
     const newRoom = async () => this.createReadyRoom()
-    const api = { newRoom }
+    const roomExpectations = async () => expectations
+    const api = { newRoom, roomExpectations }
     const opts = { seed, dht: this.swarm.dht }
     const results = await host(await loadAgreement('./agreement.mjs', import.meta.url), api, opts)
     results.agreeableKey = z32.encode(results.keyPair.publicKey)

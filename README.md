@@ -19,7 +19,7 @@ then in another terminal
 Then you can type messages in each terminal to have it go into the chat log.
 
 see [basic example](cli.mjs) for using the breakout-room
-see [AI bot example](https://github.com/DerrykBoyd/breakout-room-bot) for using it with openAI to create a bot.
+see [AI bot example](https://github.com/ryanramage/breakout-room-bot) for using it with openAI to create a bot.
 
 
 api usage

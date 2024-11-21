@@ -84,8 +84,10 @@ export class RoomManager extends EventEmitter {
     /** @type { z.infer<NewRoom> } newRoom */
     const newRoom = async () => this.createReadyRoom()
     const api = { newRoom }
-    const opts = { seed } // in the future we should make sure that agreeable and our hyperswarm use the same dht
-    return await host(await loadAgreement('./agreement.mjs', import.meta.url), api, opts)
+    const opts = { seed, dht: this.swarm.dht }
+    const results = await host(await loadAgreement('./agreement.mjs', import.meta.url), api, opts)
+    results.agreeableKey = z32.encode(results.keyPair.publicKey)
+    return results
   }
 
   async cleanup () {

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { BreakoutRoom } from './index.mjs'
+import { BreakoutRoom } from '@agree-able/room'
 
 const invite = process.argv[2]
 

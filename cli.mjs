@@ -2,6 +2,7 @@
 import { BreakoutRoom } from '@agree-able/room'
 import { loadInvite, agreeableKeyFromDomain, loadProxyFromKey  } from './loadInvite.mjs'
 import rc from 'run-con'
+import readline from 'readline'
 
 const config = rc('breakout-room', {})
 console.log(config)
@@ -14,6 +15,23 @@ async function run () {
     const proxy = await loadProxyFromKey(agreeableKey)
     const expectations = await proxy.roomExpectations()
     console.log(expectations)
+    
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    })
+
+    const answer = await new Promise(resolve => {
+      rl.question('Continue? (Y/n): ', resolve)
+    })
+    
+    rl.close()
+    
+    if (answer.toLowerCase() !== 'y' && answer !== '') {
+      console.log('Aborted')
+      process.exit(0)
+    }
+    
     invite = await proxy.newRoom()
   }
   console.log('invite:', invite)

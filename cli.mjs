@@ -36,6 +36,11 @@ async function run () {
   }
   console.log('invite:', invite)
   const room = new BreakoutRoom({ invite })
+  
+  // Restore stdin to raw mode after readline
+  process.stdin.setRawMode(true)
+  process.stdin.setEncoding('utf8')
+  process.stdin.resume()
   const hostInvite = await room.ready()
   if (hostInvite) console.log('Give out invite:', hostInvite)
 

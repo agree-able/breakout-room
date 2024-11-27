@@ -1,46 +1,20 @@
 #!/usr/bin/env node
 import { BreakoutRoom } from '@agree-able/room'
-import { loadInvite, agreeableKeyFromDomain, loadProxyFromKey  } from './loadInvite.mjs'
+import { load } from '@agree-able/invite'
 import rc from 'run-con'
-import readline from 'readline'
 
 const config = rc('breakout-room', {})
-console.log(config)
 
 async function run () {
+  const confirmRoomEnter = async (expectations, hostInfo) => {
 
-  let invite = null
-  if (config.domain) {
-    const agreeableKey = await agreeableKeyFromDomain(config.domain)
-    const proxy = await loadProxyFromKey(agreeableKey)
-    const expectations = await proxy.roomExpectations()
-    console.log(expectations)
-    
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    })
-
-    const answer = await new Promise(resolve => {
-      rl.question('Continue? (Y/n): ', resolve)
-    })
-    
-    rl.close()
-    
-    if (answer.toLowerCase() !== 'y' && answer !== '') {
-      console.log('Aborted')
-      process.exit(0)
-    }
-    
-    invite = await proxy.newRoom()
   }
+
+  const { invite } = await load(config, confirmRoomEnter)
+
   console.log('invite:', invite)
   const room = new BreakoutRoom({ invite })
-  
-  // Restore stdin to raw mode after readline
-  process.stdin.setRawMode(true)
-  process.stdin.setEncoding('utf8')
-  process.stdin.resume()
+
   const hostInvite = await room.ready()
   if (hostInvite) console.log('Give out invite:', hostInvite)
 

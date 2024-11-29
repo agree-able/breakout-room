@@ -30,10 +30,12 @@
     "@agree-able/invite": "^1.0.1",
     "@agree-able/room": "^3.4.1",
     "@agree-able/rpc": "^2.0.0",
+    "@clack/prompts": "^0.8.2",
     "autobase": "^6.5.9",
     "blind-pairing": "^2.3.1",
     "corestore": "^6.18.4",
     "hyperswarm": "^4.8.4",
+    "picocolors": "^1.1.1",
     "random-access-memory": "^6.2.1",
     "run-con": "^1.3.2",
     "z32": "^1.1.0"

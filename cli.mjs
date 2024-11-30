@@ -36,28 +36,63 @@ async function run () {
   }
 }
 
-async function onRoom (room) {
+async function onRoom(room) {
   log.info(`Room invite: ${room.getRoomInfo().invite}`)
-  let keepGoing = true
-  room.on('peerEntered', (peerKey) => log.info(`peer entered the room, ${peerKey}`))
-  room.on('peerLeft', async (peerKey) => log.info(`peer left the room, ${peerKey}`))
-  room.on('message', async (m) => log.info(`remote message recieved', ${JSON.stringify(m)}`))
-  while (keepGoing) {
-    const message = await text({
-      message: 'Send a message...',
-      placeholder: 'message to send',
-      validate (value) {
-        if (value.length === 0) return 'Value is required!'
-      }
-    })
-    if (isCancel(message)) {
-      keepGoing = false
-      await room.exit()
-      outro('Goodbye!')
-      process.exit(0)
-    }
-    room.message(message)
+  
+  // Clear screen
+  console.clear();
+  
+  const messages = [];
+  const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  // Handle incoming messages
+  room.on('peerEntered', (peerKey) => {
+    messages.push(`>> Peer entered: ${peerKey}`);
+    refreshDisplay();
+  });
+  
+  room.on('peerLeft', async (peerKey) => {
+    messages.push(`>> Peer left: ${peerKey}`);
+    refreshDisplay();
+  });
+  
+  room.on('message', async (m) => {
+    messages.push(`[Remote] ${JSON.stringify(m)}`);
+    refreshDisplay();
+  });
+
+  function refreshDisplay() {
+    console.clear();
+    // Show last N messages that fit in the screen
+    const lastMessages = messages.slice(-process.stdout.rows + 3);
+    console.log(lastMessages.join('\n'));
+    console.log('\n─'.repeat(process.stdout.columns));
+    readline.prompt(true);
   }
+
+  readline.setPrompt('Message > ');
+  readline.prompt();
+
+  readline.on('line', async (input) => {
+    if (input.toLowerCase() === '/quit') {
+      await room.exit();
+      readline.close();
+      outro('Goodbye!');
+      process.exit(0);
+    }
+    
+    messages.push(`[You] ${input}`);
+    room.message(input);
+    refreshDisplay();
+  });
+
+  // Handle window resize
+  process.stdout.on('resize', () => {
+    refreshDisplay();
+  });
 }
 
 intro('Welcome to breakout-room CLI!')

@@ -3,6 +3,7 @@ import rc from 'run-con'
 import { RoomManager, BreakoutRoom } from '@agree-able/room'
 import { handleInvite } from '@agree-able/invite'
 import readline from 'readline'
+import pc from 'picocolors'
 import { isCancel, intro, outro, log, text, spinner, note } from '@clack/prompts'
 import { validateAndUpdateConfig, confirmRoomEnter, gatherExpectations, validateParticipant } from './userConfirmation.mjs'
 
@@ -36,6 +37,7 @@ async function run () {
 
 async function onRoom(room) {
   log.info(`Room invite: ${room.getRoomInfo().invite}`)
+  const youKey = room.getRoomInfo().metadata.who.substring(0, 6)
   
   // Clear screen
   console.clear();
@@ -58,7 +60,8 @@ async function onRoom(room) {
   });
   
   room.on('message', async (m) => {
-    messages.push(`[Remote] ${m.data}`);
+    const peerKey = m.who.substring(0, 6);
+    messages.push(`[${pc.dim('peer')} ${peerKey}] ${m.data}`);
     refreshDisplay();
   });
 
@@ -92,7 +95,7 @@ async function onRoom(room) {
       process.exit(0);
     }
     
-    messages.push(`[You] ${input}`);
+    messages.push(`[${pc.bold('You')}  ${pc.green(youKey)}] ${input}`);
     room.message(input);
     refreshDisplay();
   });

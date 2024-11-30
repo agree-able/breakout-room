@@ -2,6 +2,7 @@
 import rc from 'run-con'
 import { RoomManager, BreakoutRoom } from '@agree-able/room'
 import { handleInvite } from '@agree-able/invite'
+import readline from 'readline'
 import { isCancel, intro, outro, log, text, spinner, note } from '@clack/prompts'
 import { validateAndUpdateConfig, confirmRoomEnter, gatherExpectations, validateParticipant } from './userConfirmation.mjs'
 
@@ -43,7 +44,7 @@ async function onRoom(room) {
   console.clear();
   
   const messages = [];
-  const readline = require('readline').createInterface({
+  const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
@@ -70,16 +71,16 @@ async function onRoom(room) {
     const lastMessages = messages.slice(-process.stdout.rows + 3);
     console.log(lastMessages.join('\n'));
     console.log('\n─'.repeat(process.stdout.columns));
-    readline.prompt(true);
+    rl.prompt(true);
   }
 
-  readline.setPrompt('Message > ');
-  readline.prompt();
+  rl.setPrompt('Message > ');
+  rl.prompt();
 
-  readline.on('line', async (input) => {
+  rl.on('line', async (input) => {
     if (input.toLowerCase() === '/quit') {
       await room.exit();
-      readline.close();
+      rl.close();
       outro('Goodbye!');
       process.exit(0);
     }

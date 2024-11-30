@@ -27,9 +27,9 @@
   },
   "homepage": "https://github.com/ryanramage/breakout-room#readme",
   "dependencies": {
-    "@agree-able/invite": "^1.0.1",
-    "@agree-able/room": "^3.4.1",
-    "@agree-able/rpc": "^2.0.0",
+    "@agree-able/invite": "^1.0.2",
+    "@agree-able/room": "^4.0.0",
+    "@agree-able/rpc": "^3.0.0",
     "@clack/prompts": "^0.8.2",
     "autobase": "^6.5.9",
     "blind-pairing": "^2.3.1",

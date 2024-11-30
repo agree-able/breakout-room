@@ -67,10 +67,20 @@ async function onRoom(room) {
 
   function refreshDisplay() {
     console.clear();
-    // Show last N messages that fit in the screen
-    const lastMessages = messages.slice(-process.stdout.rows + 3);
-    console.log(lastMessages.join('\n'));
-    console.log('\n─'.repeat(process.stdout.columns));
+    
+    // Calculate available space for messages
+    const availableRows = process.stdout.rows - 2; // Reserve 2 rows for input and divider
+    
+    // Get messages that will fit
+    const lastMessages = messages.slice(-availableRows);
+    
+    // Print messages
+    if (lastMessages.length > 0) {
+      console.log(lastMessages.join('\n'));
+    }
+    
+    // Position cursor and show prompt
+    process.stdout.write('\n' + '─'.repeat(process.stdout.columns) + '\n');
     rl.prompt(true);
   }
 

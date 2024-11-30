@@ -21,11 +21,8 @@ async function run () {
     const expectations = await gatherExpectations(config)
     try {
       const spin = spinner()
-      console.log('d')
       spin.start('Starting breakout room manager...')
-      console.log('e')
       const { agreeableKey } = await roomManager.startAgreeable(config, expectations, validateParticipant)
-      console.log('f')
       spin.stop('breakout room running')
       log.info(`agreeableKey: ${agreeableKey}`)
       roomManager.on('readyRoom', onRoom)
@@ -61,7 +58,7 @@ async function onRoom(room) {
   });
   
   room.on('message', async (m) => {
-    messages.push(`[Remote] ${JSON.stringify(m)}`);
+    messages.push(`[Remote] ${m.data}`);
     refreshDisplay();
   });
 

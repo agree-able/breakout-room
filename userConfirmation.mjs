@@ -29,7 +29,10 @@ const joinRoomValidate = async (config) => {
 }
 
 const startRoomManagerValidate = async (config) => {
-
+  const autoValidate = await confirm({
+    message: 'Do you want to automatically validate participants?'
+  })
+  config.autoValidate = autoValidate
 }
 
 const simpleRoomValidate = async (config) => {
@@ -171,6 +174,18 @@ export const validateParticipant = async (config, acceptance, extraInfo) => {
       `Verification: ${verified ? pc.green('✓ Verified') : pc.red('✗ Unverified')}`,
       'Keybase Identity'
     )
+  }
+
+  if (config.autoValidate) {
+    // Auto-reject if they didn't accept rules or reason
+    if (!acceptance.reason || !acceptance.rules) {
+      return { ok: false }
+    }
+    // Auto-reject if whoami required but verification failed
+    if (config.whoamiRequired && extraInfo?.whoami?.keybase && !extraInfo.whoami.keybase.verified) {
+      return { ok: false }
+    }
+    return { ok: true }
   }
 
   const ok = await confirm({

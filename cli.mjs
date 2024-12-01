@@ -61,8 +61,26 @@ async function onRoom (room, isHost) {
     refreshDisplay()
     if (isHost) {
       rl.resume()
+      // Re-attach line listener
+      setupLineListener()
     }
   })
+
+  function setupLineListener() {
+    rl.removeAllListeners('line')
+    rl.on('line', async (input) => {
+      if (input.toLowerCase() === '/quit') {
+        await room.exit()
+        rl.close()
+        outro('Goodbye!')
+        process.exit(0)
+      }
+
+      messages.push(`[${pc.bold('You')}  ${pc.green(youKey)}] ${input}`)
+      room.message(input)
+      refreshDisplay()
+    })
+  }
 
   room.on('peerLeft', async (peerKey) => {
     if (isHost) {
@@ -71,6 +89,8 @@ async function onRoom (room, isHost) {
       log.info(`Share this agreeableKey with peers: ${isHost.agreeableKey}`)
       messages.length = 0 // Clear messages
       rl.pause()
+      // Remove existing listeners to prevent duplicates
+      rl.removeAllListeners('line')
     } else {
       messages.push(`>> Peer left: ${peerKey}`)
       refreshDisplay()
@@ -105,18 +125,8 @@ async function onRoom (room, isHost) {
   rl.setPrompt('Message > ')
   rl.prompt()
 
-  rl.on('line', async (input) => {
-    if (input.toLowerCase() === '/quit') {
-      await room.exit()
-      rl.close()
-      outro('Goodbye!')
-      process.exit(0)
-    }
-
-    messages.push(`[${pc.bold('You')}  ${pc.green(youKey)}] ${input}`)
-    room.message(input)
-    refreshDisplay()
-  })
+  // Initial setup of line listener
+  setupLineListener()
 
   // Handle window resize
   process.stdout.on('resize', () => {

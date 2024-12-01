@@ -167,6 +167,8 @@ export const gatherExpectations = async (config) => {
 }
 
 export const validateParticipant = async (acceptance, extraInfo) => {
+  console.log(acceptance)
+  console.log(JSON.stringify(extraInfo, null, 2))
   const ok = await confirm({
     message: 'Allow the participant to enter?'
   })

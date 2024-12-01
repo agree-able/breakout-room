@@ -11,9 +11,9 @@ const joinRoomValidate = async (config) => {
     const howToConnect = await select({
       message: 'how to bootstrap peer connection?',
       options: [
-        { value: 'agreeableKey', label: 'use agreeableKey given to you', hint: 'reusable, but has terms to join' },
+        { value: 'agreeableKey', label: 'use an agreeableKey', hint: 'reusable, but has room entry requirements' },
         { value: 'invite', label: 'use a one time invite code' },
-        { value: 'domain', lable: 'use a domain txt lookup to find agreeable key' }
+        { value: 'domain', lable: 'use a domain txt lookup to find agreeableKey' }
       ]
     })
     const value = await text({
@@ -32,6 +32,11 @@ const startRoomManagerValidate = async (config) => {
     message: 'Do you want to automatically validate participants?'
   })
   config.autoValidate = autoValidate
+
+  if (!config.seed) {
+
+  }
+
 }
 
 const simpleRoomValidate = async (config) => {

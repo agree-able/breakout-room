@@ -4,7 +4,6 @@ import fs from 'fs'
 import path from 'path'
 import os from 'os'
 
-
 const joinRoomValidate = async (config) => {
   const { invite, agreeableKey, domain } = config
   // need one of these
@@ -66,12 +65,12 @@ export const validateAndUpdateConfig = async (config) => {
 export const confirmRoomEnter = async (config, expectations, hostInfo) => {
   log.step('Room Entry Agreement Required')
   // log.info(`${pc.bold('room reason:')} ${pc.dim(expectations.reason)}`)
-  note(expectations.reason, `room reason`)
+  note(expectations.reason, 'room reason')
   const reason = await confirm({
     message: 'Do you accept the stated purpose of this room?'
   })
   // log.step(`${pc.bold('room rules:')} ${pc.dim(expectations.rules)}`)
-  note(expectations.rules, `room rules`)
+  note(expectations.rules, 'room rules')
   const rules = await confirm({
     message: 'Do you agree to follow these room guidelines?'
   })
@@ -90,7 +89,7 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
         message: 'Select how to provide your PGP private key for local verification:',
         options: [
           { value: 'file', label: 'Select a File' },
-          { value: 'paste', label: 'Paste it in' },
+          { value: 'paste', label: 'Paste it in' }
         ]
       })
 
@@ -98,7 +97,7 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
         config.privateKeyArmoredFile = await text({
           message: 'Enter the path to your PGP private key file',
           placeholder: '~/keys/private.key',
-          validate(value) {
+          validate (value) {
             if (value.length === 0) return 'Value is required!'
             const expandedPath = expandTilde(value)
             if (!fs.existsSync(expandedPath)) {
@@ -117,7 +116,7 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
       } else if (privateKeyArmoredLocation === 'paste') {
         config.privateKeyArmored = await text({
           message: 'Paste your PGP private key',
-          validate(value) {
+          validate (value) {
             if (value.length === 0) return 'Value is required!'
             if (!looksLikePGPPrivateKey(value)) {
               return 'Text does not appear to be a PGP private key!'
@@ -125,7 +124,6 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
           }
         })
       }
-
     }
   }
 
@@ -194,13 +192,13 @@ export const validateParticipant = async (config, acceptance, extraInfo) => {
   return { ok }
 }
 
-function looksLikePGPPrivateKey(text) {
+function looksLikePGPPrivateKey (text) {
   const pgpHeader = '-----BEGIN PGP PRIVATE KEY BLOCK-----'
   const pgpFooter = '-----END PGP PRIVATE KEY BLOCK-----'
   return text.includes(pgpHeader) && text.includes(pgpFooter)
 }
 
-function expandTilde(filePath) {
+function expandTilde (filePath) {
   if (filePath[0] === '~') {
     return path.join(os.homedir(), filePath.slice(1))
   }

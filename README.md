@@ -12,18 +12,7 @@ The CLI includes an interactive menu system that guides you through all availabl
 
 ## Usage Modes
 
-### 1. Join an Existing Room
-Connect to an existing room using one of these methods:
-- **agreeableKey**: A reusable connection key with room entry requirements
-- **domain**: Lookup room details via DNS TXT record
-- **invite**: One-time invite code
-
-Example joining with domain:
-```bash
-npx breakout-room --mode=join --domain=example.com
-```
-
-### 2. Start a Room Manager
+### 1. Start a Room Manager
 Create a hub for hosting multiple rooms with configurable:
 - Room purpose and rules
 - Identity verification requirements (Keybase integration)
@@ -33,6 +22,17 @@ Create a hub for hosting multiple rooms with configurable:
 Example starting a room manager:
 ```bash
 npx breakout-room --mode=roomManager --reason="Code Review Sessions" --rules="Professional conduct"
+```
+
+### 2. Join an Existing Room
+Connect to an existing room using one of these methods:
+- **agreeableKey**: A reusable connection key with room entry requirements
+- **domain**: Lookup room details via DNS TXT record
+- **invite**: One-time invite code
+
+Example joining with domain:
+```bash
+npx breakout-room --mode=join --domain=example.com
 ```
 
 ### 3. Simple Room

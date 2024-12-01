@@ -209,11 +209,22 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
   // Show host identity verification if requested
   if (config.hostProveWhoami) {
     const verified = hostInfo?.whoami?.keybase?.verified
-    note(
-      `Username: ${pc.bold(hostInfo.whoami.keybase.username)}\n` +
-      `Verification: ${verified ? pc.green('✓ Verified') : pc.red('✗ Unverified')}`,
-      'Host Keybase Identity'
+    const verifiedDomains = hostInfo?.whoami?.keybase?.chain?.dns || []
+    const connectedDomain = config.domain
+    const domainVerified = connectedDomain && verifiedDomains.some(d => 
+      d.username === connectedDomain && d.state === 1
     )
+
+    let identityMessage = `Username: ${pc.bold(hostInfo.whoami.keybase.username)}\n` +
+      `Keybase Verification: ${verified ? pc.green('✓ Verified') : pc.red('✗ Unverified')}`
+
+    if (connectedDomain) {
+      identityMessage += `\nDomain Ownership: ${domainVerified ? 
+        pc.green(`✓ Verified owner of ${connectedDomain}`) : 
+        pc.red(`✗ Unverified for ${connectedDomain}`)}`
+    }
+
+    note(identityMessage, 'Host Keybase Identity')
     const continueAnyway = (config.autoValidate && verified) || await confirm({
       message: 'Continue to enter room?'
     })

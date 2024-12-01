@@ -204,7 +204,6 @@ export const validateAndUpdateConfig = async (config) => {
 }
 
 export const confirmRoomEnter = async (config, expectations, hostInfo) => {
-   console.log(JSON.stringify(hostInfo, null, 2))
 
   // Show host identity verification if requested
   if (config.hostProveWhoami) {

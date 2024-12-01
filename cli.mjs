@@ -50,15 +50,10 @@ async function onRoom (room, isHost) {
   }
 
   const messages = []
-  // Create readline interface with raw mode to prevent character echo
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout,
-    terminal: true
+    output: process.stdout
   })
-  
-  // Set stdin to raw mode to prevent double echoing of characters
-  process.stdin.setRawMode(true)
 
   // Handle incoming messages
   room.on('peerEntered', (peerKey) => {
@@ -73,15 +68,6 @@ async function onRoom (room, isHost) {
 
   function setupLineListener() {
     rl.removeAllListeners('line')
-    process.stdin.removeAllListeners('keypress')
-    
-    // Handle each keypress
-    process.stdin.on('keypress', (chunk, key) => {
-      if (key && key.ctrl && key.name === 'c') {
-        process.exit()
-      }
-    })
-
     rl.on('line', async (input) => {
       if (input.toLowerCase() === '/quit') {
         await room.exit()
@@ -147,10 +133,6 @@ async function onRoom (room, isHost) {
     refreshDisplay()
   })
 
-  // Cleanup when exiting
-  process.on('exit', () => {
-    process.stdin.setRawMode(false)
-  })
 }
 
 intro('Welcome to breakout-room CLI!')

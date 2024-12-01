@@ -28,7 +28,7 @@ const joinRoomValidate = async (config) => {
     config[howToConnect] = value
   }
   if (!invite) {
-    config.hostProveWhoami = await confirm({
+    config.hostProveWhoami = config.hostProveWhoami || await confirm({
       message: 'Do you want to verify the host\'s identity?'
     })
   }
@@ -146,6 +146,7 @@ const startRoomManagerValidate = async (config) => {
   if (config.config) {
     const configPath = expandTilde(config.config)
     const configData = {
+      mode: config.mode,
       seed: config.seed,
       reason: config.reason,
       rules: config.rules,
@@ -176,7 +177,7 @@ const simpleRoomValidate = async (config) => {
 }
 
 export const validateAndUpdateConfig = async (config) => {
-  const mode = config.mode || await select({
+  config.mode = config.mode || await select({
     message: 'What are you trying to do?',
     options: [
       { value: 'join', label: 'Join an existing room' },
@@ -184,8 +185,8 @@ export const validateAndUpdateConfig = async (config) => {
       { value: 'room', label: 'Start a simple room' }
     ]
   })
-  if (mode === 'join') return await joinRoomValidate(config)
-  if (mode === 'roomManager') return await startRoomManagerValidate(config)
+  if (config.mode === 'join') return await joinRoomValidate(config)
+  if (config.mode === 'roomManager') return await startRoomManagerValidate(config)
   return await simpleRoomValidate(config)
 }
 

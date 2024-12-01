@@ -4,18 +4,6 @@ import fs from 'fs'
 import path from 'path'
 import os from 'os'
 
-function looksLikePGPPrivateKey(text) {
-  const pgpHeader = '-----BEGIN PGP PRIVATE KEY BLOCK-----'
-  const pgpFooter = '-----END PGP PRIVATE KEY BLOCK-----'
-  return text.includes(pgpHeader) && text.includes(pgpFooter)
-}
-
-function expandTilde(filePath) {
-  if (filePath[0] === '~') {
-    return path.join(os.homedir(), filePath.slice(1))
-  }
-  return filePath
-}
 
 const joinRoomValidate = async (config) => {
   const { invite, agreeableKey, domain } = config
@@ -189,4 +177,17 @@ export const validateParticipant = async (acceptance, extraInfo) => {
     message: 'Allow the participant to enter?'
   })
   return { ok }
+}
+
+function looksLikePGPPrivateKey(text) {
+  const pgpHeader = '-----BEGIN PGP PRIVATE KEY BLOCK-----'
+  const pgpFooter = '-----END PGP PRIVATE KEY BLOCK-----'
+  return text.includes(pgpHeader) && text.includes(pgpFooter)
+}
+
+function expandTilde(filePath) {
+  if (filePath[0] === '~') {
+    return path.join(os.homedir(), filePath.slice(1))
+  }
+  return filePath
 }

@@ -120,16 +120,16 @@ const startRoomManagerValidate = async (config) => {
     const seed = crypto.randomBytes(32)
     config.seed = z32.encode(seed)
 
-    // Ask if they want to save it
-    const saveSeed = await confirm({
-      message: 'Would you like to save this seed to ~/.breakout-roomrc? This will allow you to have the same agreeableKey if you restart.'
-    })
+    // // Ask if they want to save it
+    // const saveSeed = await confirm({
+    //   message: 'Would you like to save this seed to ~/.breakout-roomrc? This will allow you to have the same agreeableKey if you restart.'
+    // })
 
-    if (saveSeed) {
-      const configPath = path.join(os.homedir(), '.breakout-roomrc')
-      fs.writeFileSync(configPath, JSON.stringify({ seed: config.seed }, null, 2))
-      note('Seed saved successfully!', 'Configuration')
-    }
+    // if (saveSeed) {
+    //   const configPath = path.join(os.homedir(), '.breakout-roomrc')
+    //   fs.writeFileSync(configPath, JSON.stringify({ seed: config.seed }, null, 2))
+    //   note('Seed saved successfully!', 'Configuration')
+    // }
   }
 
 }

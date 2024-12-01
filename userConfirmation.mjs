@@ -14,8 +14,8 @@ const joinRoomValidate = async (config) => {
       message: 'how to bootstrap peer connection?',
       options: [
         { value: 'agreeableKey', label: 'use an agreeableKey', hint: 'reusable, but has room entry requirements' },
-        { value: 'invite', label: 'use a one time invite code' },
-        { value: 'domain', lable: 'use a domain txt lookup to find agreeableKey' }
+        { value: 'domain', lable: 'use a domain txt lookup to find agreeableKey' },
+        { value: 'invite', label: 'use a one time invite code' }
       ]
     })
     const value = await text({
@@ -26,6 +26,11 @@ const joinRoomValidate = async (config) => {
       }
     })
     config[howToConnect] = value
+  }
+  if (!invite) {
+    config.hostProveWhoami = await confirm({
+      message: 'Do you want to verify the host\'s identity?'
+    })
   }
 }
 

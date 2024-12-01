@@ -72,7 +72,7 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
   if (expectations.whoamiRequired) {
     if (!config.keybaseUsername) {
       config.keybaseUsername = await text({
-        message: `host requires you to validate your identity with keybase`,
+        message: `Enter your keybase username. Host wants to verify you.`,
         validate (value) {
           if (value.length === 0) return 'Value is required!'
         }
@@ -80,7 +80,7 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
     }
     if (!config.privateKeyArmored && !config.privateKeyArmoredFile) {
       const privateKeyArmoredLocation = await select({
-        message: 'You need to private your pgp private key to sign your indentity',
+        message: 'To sign your verification locally, lest user your pgp private key',
         options: [
           { value: 'file', label: 'Select a File' },
           { value: 'paste', label: 'Paste it in' },

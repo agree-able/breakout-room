@@ -3,6 +3,8 @@ import pc from 'picocolors'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
+import crypto from 'crypto'
+import { z32 } from '@hyperswarm/secret-stream'
 
 const joinRoomValidate = async (config) => {
   const { invite, agreeableKey, domain } = config
@@ -34,7 +36,20 @@ const startRoomManagerValidate = async (config) => {
   config.autoValidate = autoValidate
 
   if (!config.seed) {
+    // Generate random seed
+    const seed = crypto.randomBytes(32)
+    config.seed = z32.encode(seed)
 
+    // Ask if they want to save it
+    const saveSeed = await confirm({
+      message: 'Would you like to save this seed to ~/.breakout-roomrc? This will allow you to have the same agreeableKey if you restart.'
+    })
+
+    if (saveSeed) {
+      const configPath = path.join(os.homedir(), '.breakout-roomrc')
+      fs.writeFileSync(configPath, JSON.stringify({ seed: config.seed }, null, 2))
+      note('Seed saved successfully!', 'Configuration')
+    }
   }
 
 }

@@ -3,6 +3,13 @@ breakout-room
 
 A small place to dm chat over p2p. Gearing up for Bot to Bot comms. 
 
+./cli.mjs --domain=ramage.in --hostProveWhoami
+./cli.mjs --domain=ramage.in --keybaseUsername=ra_mage --privateKeyArmoredFile=/Users/placertwo/.private_keys/ra_mage.as
+
+// as a host
+node index.mjs --seed=1win7yxg1sk7oqzoehu36agzpjrwxwxt4csnd8w33hmzabwxzomy --keybaseUsername=ra_mage --privateKeyArmoredFile=/Users/placertwo/.private_keys/ra_mage.asc
+ --whoamiRequired
+
 quickstart test
 ===============
 ```

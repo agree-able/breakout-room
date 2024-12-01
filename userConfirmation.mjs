@@ -1,5 +1,21 @@
 import { text, confirm, select, log, note } from '@clack/prompts'
 import pc from 'picocolors'
+import fs from 'fs'
+import path from 'path'
+import os from 'os'
+
+function looksLikePGPPrivateKey(text) {
+  const pgpHeader = '-----BEGIN PGP PRIVATE KEY BLOCK-----'
+  const pgpFooter = '-----END PGP PRIVATE KEY BLOCK-----'
+  return text.includes(pgpHeader) && text.includes(pgpFooter)
+}
+
+function expandTilde(filePath) {
+  if (filePath[0] === '~') {
+    return path.join(os.homedir(), filePath.slice(1))
+  }
+  return filePath
+}
 
 const joinRoomValidate = async (config) => {
   const { invite, agreeableKey, domain } = config
@@ -93,6 +109,18 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
           placeholder: '~/keys/private.key',
           validate(value) {
             if (value.length === 0) return 'Value is required!'
+            const expandedPath = expandTilde(value)
+            if (!fs.existsSync(expandedPath)) {
+              return 'File does not exist!'
+            }
+            try {
+              const content = fs.readFileSync(expandedPath, 'utf8')
+              if (!looksLikePGPPrivateKey(content)) {
+                return 'File does not appear to be a PGP private key!'
+              }
+            } catch (err) {
+              return 'Unable to read file!'
+            }
           }
         })
       } else if (privateKeyArmoredLocation === 'paste') {
@@ -100,6 +128,9 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
           message: 'Paste your PGP private key',
           validate(value) {
             if (value.length === 0) return 'Value is required!'
+            if (!looksLikePGPPrivateKey(value)) {
+              return 'Text does not appear to be a PGP private key!'
+            }
           }
         })
       }

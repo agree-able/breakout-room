@@ -153,6 +153,21 @@ export const validateAndUpdateConfig = async (config) => {
 }
 
 export const confirmRoomEnter = async (config, expectations, hostInfo) => {
+  // Show host identity verification if requested
+  if (config.hostProveWhoami && hostInfo?.whoami?.keybase) {
+    const verified = hostInfo.whoami.keybase.verified
+    note(
+      `Username: ${pc.bold(hostInfo.whoami.keybase.username)}\n` +
+      `Verification: ${verified ? pc.green('✓ Verified') : pc.red('✗ Unverified')}`,
+      'Host Keybase Identity'
+    )
+    const continueAnyway = await confirm({
+      message: 'Continue to enter room?'
+    })
+    if (!continueAnyway) {
+      return { rules: false, reason: false }
+    }
+  }
   log.step(`${pc.bgGreen(pc.black('Room Entry Agreement Required'))}`)
   // log.info(`${pc.bold('room reason:')} ${pc.dim(expectations.reason)}`)
   note(expectations.reason, 'room reason')
@@ -162,15 +177,6 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
   // log.step(`${pc.bold('room rules:')} ${pc.dim(expectations.rules)}`)
   note(expectations.rules, 'room rules')
 
-  // Show host identity verification if requested
-  if (config.hostProveWhoami && hostInfo?.whoami?.keybase) {
-    const verified = hostInfo.whoami.keybase.verified
-    note(
-      `Username: ${pc.bold(hostInfo.whoami.keybase.username)}\n` +
-      `Verification: ${verified ? pc.green('✓ Verified') : pc.red('✗ Unverified')}`,
-      'Host Keybase Identity'
-    )
-  }
   const rules = await confirm({
     message: 'Do you agree to follow these room guidelines?'
   })

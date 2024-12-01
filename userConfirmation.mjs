@@ -167,8 +167,24 @@ export const gatherExpectations = async (config) => {
 }
 
 export const validateParticipant = async (acceptance, extraInfo) => {
-  console.log(acceptance)
-  console.log(JSON.stringify(extraInfo, null, 2))
+  // Show what the participant agreed to
+  log.step('Participant Agreement Status:')
+  note(
+    `Room Reason: ${acceptance.reason ? pc.green('✓ Agreed') : pc.red('✗ Declined')}\n` +
+    `Room Rules: ${acceptance.rules ? pc.green('✓ Agreed') : pc.red('✗ Declined')}`,
+    'Agreements'
+  )
+
+  // If whoami verification was required, show the verification status
+  if (extraInfo?.whoami?.keybase) {
+    const verified = extraInfo.whoami.keybase.verified
+    note(
+      `Username: ${pc.bold(extraInfo.whoami.keybase.username)}\n` +
+      `Verification: ${verified ? pc.green('✓ Verified') : pc.red('✗ Unverified')}`,
+      'Keybase Identity'
+    )
+  }
+
   const ok = await confirm({
     message: 'Allow the participant to enter?'
   })

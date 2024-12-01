@@ -134,23 +134,23 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
 
 export const gatherExpectations = async (config) => {
   const reason = config.meaning || await text({
-    message: 'Give an explination of what will be accomplished in the room?',
-    placeholder: 'We are playing 20 questions',
+    message: 'What is the purpose of this room?',
+    placeholder: 'Example: Collaborative code review session',
     initialValue: '',
     validate (value) {
       if (value.length === 0) return 'Value is required!'
     }
   })
   const rules = config.rules || await text({
-    message: 'What are the room rules?',
-    placeholder: 'No profanity',
+    message: 'Please specify the room guidelines and expectations:',
+    placeholder: 'Example: Professional conduct, stay on topic',
     initialValue: '',
     validate (value) {
       if (value.length === 0) return 'Value is required!'
     }
   })
   const whoamiRequired = config.whoamiRequired || await confirm({
-    message: 'Do you need participants to validate their identity with keybase?'
+    message: 'Require Keybase identity verification for participants?'
   })
   const expectations = { reason, rules, whoamiRequired }
 

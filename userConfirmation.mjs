@@ -63,7 +63,7 @@ export const validateAndUpdateConfig = async (config) => {
 }
 
 export const confirmRoomEnter = async (config, expectations, hostInfo) => {
-  log.step('Room Entry Agreement Required')
+  log.step(`${pc.bgGreen(pc.black('Room Entry Agreement Required'))}`)
   // log.info(`${pc.bold('room reason:')} ${pc.dim(expectations.reason)}`)
   note(expectations.reason, 'room reason')
   const reason = await confirm({
@@ -157,7 +157,7 @@ export const gatherExpectations = async (config) => {
 
 export const validateParticipant = async (config, acceptance, extraInfo) => {
   // Show what the participant agreed to
-  log.step('Participant Agreement Status:')
+  log.step(`${pc.bgGreen(pc.black('Participant Agreement Status:'))}`)
   note(
     `Room Reason: ${acceptance.reason ? pc.green('✓ Agreed') : pc.red('✗ Declined')}\n` +
     `Room Rules: ${acceptance.rules ? pc.green('✓ Agreed') : pc.red('✗ Declined')}`,

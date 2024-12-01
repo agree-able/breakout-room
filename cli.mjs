@@ -44,9 +44,9 @@ async function onRoom (room, isHost) {
   console.clear()
 
   if (isHost) {
-    log.info(`Share this agreeableKey with peers: ${isHost.agreeableKey}`)
+    // log.info(`Share this agreeableKey with peers: ${isHost.agreeableKey}`)
   } else {
-    log.info(`Room invite: ${room.getRoomInfo().invite}`)
+    // log.info(`Room invite: ${room.getRoomInfo().invite}`)
   }
 
   const messages = []

@@ -12,6 +12,7 @@ const config = rc('breakout-room', {})
 async function run () {
   await validateAndUpdateConfig(config)
   const _confirmRoomEnter = confirmRoomEnter.bind(null, config) // just so we can get the config
+  const _validateParticipant = validateParticipant.bind(null, config)
   const { invite } = await handleInvite(config, _confirmRoomEnter)
   if (invite) {
     const room = new BreakoutRoom({ invite })
@@ -24,7 +25,7 @@ async function run () {
     try {
       const spin = spinner()
       spin.start('Starting breakout room manager...')
-      const { agreeableKey } = await roomManager.startAgreeable(config, expectations, validateParticipant)
+      const { agreeableKey } = await roomManager.startAgreeable(config, expectations, _validateParticipant)
       spin.stop('breakout room running')
       log.info(`agreeableKey: ${agreeableKey}`)
       roomManager.on('readyRoom', onRoom)

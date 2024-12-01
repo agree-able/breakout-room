@@ -106,12 +106,16 @@ const startRoomManagerValidate = async (config) => {
     }
   }
 
-  config.autoValidate = config.autoValidate || await confirm({
-    message: 'Do you want to automatically validate participants?'
-  })
-  config.whoamiRequired = config.whoamiRequired || await confirm({
-    message: 'Require Keybase identity verification for participants?'
-  })
+  if (config.autoValidate === undefined) {
+    config.autoValidate = await confirm({
+      message: 'Do you want to automatically validate participants?'
+    })
+  }
+  if (config.whoamiRequired === undefined) {
+    config.whoamiRequired = await confirm({
+      message: 'Require Keybase identity verification for participants?'
+    })
+  }
 
   if (config.seed) {
     note(`Using existing seed starting with: ${config.seed.substring(0, 6)}`, 'Configuration')

@@ -51,12 +51,12 @@ const startRoomManagerValidate = async (config) => {
       if (value.length === 0) return 'Value is required!'
     }
   })
-  const useKeybase = await confirm({
+  const useKeybase = (config.keybaseUsername && (config.privateKeyArmoredFile || config.privateKeyArmored)) || await confirm({
     message: 'Allow participants to verifiy who the room host is with Keybase?'
   })
   
   if (useKeybase) {
-    config.keybaseUsername = await text({
+    config.keybaseUsername = config.keybaseUsername || await text({
       message: 'Please enter your Keybase username for identity verification:',
       validate (value) {
         if (value.length === 0) return 'Value is required!'

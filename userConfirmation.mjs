@@ -34,7 +34,7 @@ const joinRoomValidate = async (config) => {
     })
     config[howToConnect] = value
   }
-  if (!invite) {
+  if (!invite && config.hostProveWhoami === undefined) {
     config.hostProveWhoami = config.hostProveWhoami || await confirm({
       message: 'Do you want to verify the host\'s identity?'
     })
@@ -188,6 +188,7 @@ export const validateAndUpdateConfig = async (config) => {
   config.autoValidate = convertStringToBoolean(config.autoValidate)
   config.whoamiRequired = convertStringToBoolean(config.whoamiRequired)
   config.hostProveWhoami = convertStringToBoolean(config.hostProveWhoami)
+  config.agree = convertStringToBoolean(config.agree)
 
   config.mode = config.mode || await select({
     message: 'What are you trying to do?',
@@ -204,14 +205,14 @@ export const validateAndUpdateConfig = async (config) => {
 
 export const confirmRoomEnter = async (config, expectations, hostInfo) => {
   // Show host identity verification if requested
-  if (config.hostProveWhoami && hostInfo?.whoami?.keybase) {
-    const verified = hostInfo.whoami.keybase.verified
+  if (config.hostProveWhoami) {
+    const verified = hostInfo?.whoami?.keybase?.verified
     note(
       `Username: ${pc.bold(hostInfo.whoami.keybase.username)}\n` +
       `Verification: ${verified ? pc.green('✓ Verified') : pc.red('✗ Unverified')}`,
       'Host Keybase Identity'
     )
-    const continueAnyway = await confirm({
+    const continueAnyway = (config.autoValidate && verified) || await confirm({
       message: 'Continue to enter room?'
     })
     if (!continueAnyway) {
@@ -221,13 +222,13 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
   log.step(`${pc.bgGreen(pc.black('Room Entry Agreement Required'))}`)
   // log.info(`${pc.bold('room reason:')} ${pc.dim(expectations.reason)}`)
   note(expectations.reason, 'room reason')
-  const reason = await confirm({
+  const reason = config.agree || await confirm({
     message: 'Do you accept the stated purpose of this room?'
   })
   // log.step(`${pc.bold('room rules:')} ${pc.dim(expectations.rules)}`)
   note(expectations.rules, 'room rules')
 
-  const rules = await confirm({
+  const rules = config.agree || await confirm({
     message: 'Do you agree to follow these room guidelines?'
   })
 

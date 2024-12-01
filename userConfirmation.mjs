@@ -119,17 +119,50 @@ const startRoomManagerValidate = async (config) => {
     // Generate random seed
     const seed = crypto.randomBytes(32)
     config.seed = z32.encode(seed)
+  }
 
-    // // Ask if they want to save it
-    // const saveSeed = await confirm({
-    //   message: 'Would you like to save this seed to ~/.breakout-roomrc? This will allow you to have the same agreeableKey if you restart.'
-    // })
+  // Handle config file storage
+  if (!config.config) {
+    const saveConfig = await confirm({
+      message: 'Would you like to save all settings to a config file for next time?'
+    })
 
-    // if (saveSeed) {
-    //   const configPath = path.join(os.homedir(), '.breakout-roomrc')
-    //   fs.writeFileSync(configPath, JSON.stringify({ seed: config.seed }, null, 2))
-    //   note('Seed saved successfully!', 'Configuration')
-    // }
+    if (saveConfig) {
+      config.config = await text({
+        message: 'Enter the path for the config file',
+        placeholder: '~/myroom-config.json',
+        validate(value) {
+          if (!value.endsWith('.json')) return 'File must have .json extension!'
+          return
+        }
+      })
+    }
+  }
+
+  if (config.config) {
+    const configPath = expandTilde(config.config)
+    const configData = {
+      seed: config.seed,
+      reason: config.reason,
+      rules: config.rules,
+      autoValidate: config.autoValidate,
+      whoamiRequired: config.whoamiRequired
+    }
+    
+    // Add keybase config if present
+    if (config.keybaseUsername) {
+      configData.keybaseUsername = config.keybaseUsername
+      if (config.privateKeyArmoredFile) {
+        configData.privateKeyArmoredFile = config.privateKeyArmoredFile
+      }
+      if (config.privateKeyArmored) {
+        configData.privateKeyArmored = config.privateKeyArmored
+      }
+    }
+
+    fs.writeFileSync(configPath, JSON.stringify(configData, null, 2))
+    note(`Settings saved to: ${configPath}`, 'Configuration')
+    note(`Start app next time with: --config=${configPath}`, 'Next Steps')
   }
 
 }

@@ -6,6 +6,13 @@ import os from 'os'
 import crypto from 'crypto'
 import  z32  from 'z32'
 
+function convertStringToBoolean(value) {
+  if (typeof value === 'string') {
+    return value.toLowerCase() === 'true'
+  }
+  return value
+}
+
 const joinRoomValidate = async (config) => {
   const { invite, agreeableKey, domain } = config
   // need one of these
@@ -177,6 +184,11 @@ const simpleRoomValidate = async (config) => {
 }
 
 export const validateAndUpdateConfig = async (config) => {
+  // Convert string booleans to actual booleans
+  config.autoValidate = convertStringToBoolean(config.autoValidate)
+  config.whoamiRequired = convertStringToBoolean(config.whoamiRequired)
+  config.hostProveWhoami = convertStringToBoolean(config.hostProveWhoami)
+
   config.mode = config.mode || await select({
     message: 'What are you trying to do?',
     options: [

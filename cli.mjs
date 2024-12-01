@@ -11,7 +11,8 @@ const config = rc('breakout-room', {})
 
 async function run () {
   await validateAndUpdateConfig(config)
-  const { invite } = await handleInvite(config, confirmRoomEnter)
+  const _confirmRoomEnter = confirmRoomEnter.bind(null, config) // just so we can get the config
+  const { invite } = await handleInvite(config, _confirmRoomEnter)
   if (invite) {
     const room = new BreakoutRoom({ invite })
     await room.ready()

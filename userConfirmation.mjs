@@ -64,22 +64,22 @@ export const validateAndUpdateConfig = async (config) => {
 }
 
 export const confirmRoomEnter = async (config, expectations, hostInfo) => {
-  log.step('We are about to enter a room that you have to agree to join')
+  log.step('Room Entry Agreement Required')
   // log.info(`${pc.bold('room reason:')} ${pc.dim(expectations.reason)}`)
   note(expectations.reason, `room reason`)
   const reason = await confirm({
-    message: 'Do you agree to the room reason?'
+    message: 'Do you accept the stated purpose of this room?'
   })
   // log.step(`${pc.bold('room rules:')} ${pc.dim(expectations.rules)}`)
   note(expectations.rules, `room rules`)
   const rules = await confirm({
-    message: 'Do you agree to the room rules?'
+    message: 'Do you agree to follow these room guidelines?'
   })
 
   if (expectations.whoamiRequired) {
     if (!config.keybaseUsername) {
       config.keybaseUsername = await text({
-        message: `Enter your keybase username. Host wants to verify you.`,
+        message: 'Please enter your Keybase username for identity verification:',
         validate (value) {
           if (value.length === 0) return 'Value is required!'
         }
@@ -87,7 +87,7 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
     }
     if (!config.privateKeyArmored && !config.privateKeyArmoredFile) {
       const privateKeyArmoredLocation = await select({
-        message: 'To sign your verification locally, lest user your pgp private key',
+        message: 'Select how to provide your PGP private key for local verification:',
         options: [
           { value: 'file', label: 'Select a File' },
           { value: 'paste', label: 'Paste it in' },

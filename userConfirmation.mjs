@@ -87,6 +87,23 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
         ]
       })
 
+      if (privateKeyArmoredLocation === 'file') {
+        config.privateKeyArmoredFile = await text({
+          message: 'Enter the path to your PGP private key file',
+          placeholder: '~/keys/private.key',
+          validate(value) {
+            if (value.length === 0) return 'Value is required!'
+          }
+        })
+      } else if (privateKeyArmoredLocation === 'paste') {
+        config.privateKeyArmored = await text({
+          message: 'Paste your PGP private key',
+          validate(value) {
+            if (value.length === 0) return 'Value is required!'
+          }
+        })
+      }
+
     }
   }
 

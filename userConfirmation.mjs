@@ -35,7 +35,9 @@ const startRoomManagerValidate = async (config) => {
   })
   config.autoValidate = autoValidate
 
-  if (!config.seed) {
+  if (config.seed) {
+    note(`Using existing seed starting with: ${config.seed.substring(0, 6)}`, 'Configuration')
+  } else {
     // Generate random seed
     const seed = crypto.randomBytes(32)
     config.seed = z32.encode(seed)

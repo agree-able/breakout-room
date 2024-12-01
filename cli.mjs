@@ -5,7 +5,7 @@ import { handleInvite } from '@agree-able/invite'
 import readline from 'readline'
 import pc from 'picocolors'
 import { intro, outro, log, spinner } from '@clack/prompts'
-import { validateAndUpdateConfig, confirmRoomEnter, gatherExpectations, validateParticipant } from './userConfirmation.mjs'
+import { validateAndUpdateConfig, confirmRoomEnter, validateParticipant } from './userConfirmation.mjs'
 
 const config = rc('breakout-room', {})
 
@@ -21,7 +21,8 @@ async function run () {
     onRoom(room)
   } else {
     const roomManager = new RoomManager()
-    const expectations = await gatherExpectations(config)
+    const { reason, rules, whoamiRequired } = config 
+    const expectations = { reason, rules, whoamiRequired }
     try {
       const spin = spinner()
       spin.start('Starting breakout room manager...')

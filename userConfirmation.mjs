@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import os from 'os'
 import crypto from 'crypto'
-import { z32 } from '@hyperswarm/secret-stream'
+import  z32  from 'z32'
 
 const joinRoomValidate = async (config) => {
   const { invite, agreeableKey, domain } = config
@@ -30,10 +30,83 @@ const joinRoomValidate = async (config) => {
 }
 
 const startRoomManagerValidate = async (config) => {
-  const autoValidate = await confirm({
+  config.reason = config.reason || await text({
+    message: 'What is the purpose of this room?',
+    placeholder: 'Example: Collaborative code review session',
+    initialValue: '',
+    validate (value) {
+      if (value.length === 0) return 'Value is required!'
+    }
+  })
+  config.rules = config.rules || await text({
+    message: 'Please specify the room guidelines and expectations:',
+    placeholder: 'Example: Professional conduct, stay on topic',
+    initialValue: '',
+    validate (value) {
+      if (value.length === 0) return 'Value is required!'
+    }
+  })
+  const useKeybase = await confirm({
+    message: 'Allow participants to verifiy who the room host is with Keybase?'
+  })
+  
+  if (useKeybase) {
+    config.keybaseUsername = await text({
+      message: 'Please enter your Keybase username for identity verification:',
+      validate (value) {
+        if (value.length === 0) return 'Value is required!'
+      }
+    })
+
+    if (!config.privateKeyArmored && !config.privateKeyArmoredFile) {
+      const privateKeyArmoredLocation = await select({
+        message: 'Select how to provide your PGP private key for local verification:',
+        options: [
+          { value: 'file', label: 'Select a file' },
+          { value: 'paste', label: 'Paste it in' }
+        ]
+      })
+
+      if (privateKeyArmoredLocation === 'file') {
+        config.privateKeyArmoredFile = await text({
+          message: 'Enter the path to your PGP private key file',
+          placeholder: '~/keys/private.key',
+          validate (value) {
+            if (value.length === 0) return 'Value is required!'
+            const expandedPath = expandTilde(value)
+            if (!fs.existsSync(expandedPath)) {
+              return 'File does not exist!'
+            }
+            try {
+              const content = fs.readFileSync(expandedPath, 'utf8')
+              if (!looksLikePGPPrivateKey(content)) {
+                return 'File does not appear to be a PGP private key!'
+              }
+            } catch (err) {
+              return 'Unable to read file!'
+            }
+          }
+        })
+      } else if (privateKeyArmoredLocation === 'paste') {
+        config.privateKeyArmored = await text({
+          message: 'Paste your PGP private key',
+          validate (value) {
+            if (value.length === 0) return 'Value is required!'
+            if (!looksLikePGPPrivateKey(value)) {
+              return 'Text does not appear to be a PGP private key!'
+            }
+          }
+        })
+      }
+    }
+  }
+
+  config.autoValidate = config.autoValidate || await confirm({
     message: 'Do you want to automatically validate participants?'
   })
-  config.autoValidate = autoValidate
+  config.whoamiRequired = config.whoamiRequired || await confirm({
+    message: 'Require Keybase identity verification for participants?'
+  })
 
   if (config.seed) {
     note(`Using existing seed starting with: ${config.seed.substring(0, 6)}`, 'Configuration')
@@ -61,26 +134,16 @@ const simpleRoomValidate = async (config) => {
 }
 
 export const validateAndUpdateConfig = async (config) => {
-  const { invite, agreeableKey, domain } = config
-  const joinRoom = invite || agreeableKey || domain
-
-  const { seed } = config
-  const startRoomManager = seed
-
-  if (joinRoom && !startRoomManager) return await joinRoomValidate(config)
-  if (startRoomManager && !joinRoom) return await startRoomManagerValidate(config)
-
-  // if none or both, lets clarify with the user
-  const projectType = await select({
+  const mode = config.mode || await select({
     message: 'What are you trying to do?',
     options: [
-      { value: 'joinRoom', label: 'Join an existing room' },
-      { value: 'startRoomManager', label: 'Start a room manager', hint: 'host many rooms/connections' },
-      { value: 'simpleRoom', label: 'Start a simple room' }
+      { value: 'join', label: 'Join an existing room' },
+      { value: 'roomManager', label: 'Start a room manager', hint: 'host many rooms/connections' },
+      { value: 'room', label: 'Start a simple room' }
     ]
   })
-  if (projectType === 'joinRoom') return await joinRoomValidate(config)
-  if (projectType === 'startRoomManager') return await startRoomManagerValidate(config)
+  if (mode === 'join') return await joinRoomValidate(config)
+  if (mode === 'roomManager') return await startRoomManagerValidate(config)
   return await simpleRoomValidate(config)
 }
 
@@ -110,7 +173,7 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
       const privateKeyArmoredLocation = await select({
         message: 'Select how to provide your PGP private key for local verification:',
         options: [
-          { value: 'file', label: 'Select a File' },
+          { value: 'file', label: 'Select a file' },
           { value: 'paste', label: 'Paste it in' }
         ]
       })
@@ -150,31 +213,6 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
   }
 
   return { rules, reason }
-}
-
-export const gatherExpectations = async (config) => {
-  const reason = config.meaning || await text({
-    message: 'What is the purpose of this room?',
-    placeholder: 'Example: Collaborative code review session',
-    initialValue: '',
-    validate (value) {
-      if (value.length === 0) return 'Value is required!'
-    }
-  })
-  const rules = config.rules || await text({
-    message: 'Please specify the room guidelines and expectations:',
-    placeholder: 'Example: Professional conduct, stay on topic',
-    initialValue: '',
-    validate (value) {
-      if (value.length === 0) return 'Value is required!'
-    }
-  })
-  const whoamiRequired = config.whoamiRequired || await confirm({
-    message: 'Require Keybase identity verification for participants?'
-  })
-  const expectations = { reason, rules, whoamiRequired }
-
-  return expectations
 }
 
 export const validateParticipant = async (config, acceptance, extraInfo) => {

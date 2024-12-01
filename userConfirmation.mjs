@@ -56,7 +56,7 @@ export const validateAndUpdateConfig = async (config) => {
   return await simpleRoomValidate(config)
 }
 
-export const confirmRoomEnter = async (expectations, hostInfo) => {
+export const confirmRoomEnter = async (config, expectations, hostInfo) => {
   log.step('We are about to enter a room that you have to agree to join')
   // log.info(`${pc.bold('room reason:')} ${pc.dim(expectations.reason)}`)
   note(expectations.reason, `room reason`)
@@ -68,6 +68,28 @@ export const confirmRoomEnter = async (expectations, hostInfo) => {
   const rules = await confirm({
     message: 'Do you agree to the room rules?'
   })
+
+  if (expectations.whoamiRequired) {
+    if (!config.keybaseUsername) {
+      config.keybaseUsername = await text({
+        message: `host requires you to validate your identity with keybase`,
+        validate (value) {
+          if (value.length === 0) return 'Value is required!'
+        }
+      })
+    }
+    if (!config.privateKeyArmored && !config.privateKeyArmoredFile) {
+      const privateKeyArmoredLocation = await select({
+        message: 'You need to private your pgp private key to sign your indentity',
+        options: [
+          { value: 'file', label: 'Select a File' },
+          { value: 'paste', label: 'Paste it in' },
+        ]
+      })
+
+    }
+  }
+
   return { rules, reason }
 }
 

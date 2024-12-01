@@ -161,6 +161,16 @@ export const confirmRoomEnter = async (config, expectations, hostInfo) => {
   })
   // log.step(`${pc.bold('room rules:')} ${pc.dim(expectations.rules)}`)
   note(expectations.rules, 'room rules')
+
+  // Show host identity verification if requested
+  if (config.hostProveWhoami && hostInfo?.whoami?.keybase) {
+    const verified = hostInfo.whoami.keybase.verified
+    note(
+      `Username: ${pc.bold(hostInfo.whoami.keybase.username)}\n` +
+      `Verification: ${verified ? pc.green('✓ Verified') : pc.red('✗ Unverified')}`,
+      'Host Keybase Identity'
+    )
+  }
   const rules = await confirm({
     message: 'Do you agree to follow these room guidelines?'
   })

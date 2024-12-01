@@ -38,11 +38,18 @@ async function run () {
 }
 
 async function onRoom(room) {
-  log.info(`Room invite: ${room.getRoomInfo().invite}`)
+  const isHost = !room.getRoomInfo().invite
   const youKey = room.getRoomInfo().metadata.who.substring(0, 6)
+  const agreeableKey = room.getRoomInfo().agreeableKey
   
   // Clear screen
   console.clear();
+  
+  if (isHost) {
+    log.info(`Share this agreeableKey with peers: ${agreeableKey}`)
+  } else {
+    log.info(`Room invite: ${room.getRoomInfo().invite}`)
+  }
   
   const messages = [];
   const rl = readline.createInterface({
@@ -54,11 +61,22 @@ async function onRoom(room) {
   room.on('peerEntered', (peerKey) => {
     messages.push(`>> Peer entered: ${peerKey}`);
     refreshDisplay();
+    if (isHost) {
+      rl.resume();
+    }
   });
   
   room.on('peerLeft', async (peerKey) => {
-    messages.push(`>> Peer left: ${peerKey}`);
-    refreshDisplay();
+    if (isHost) {
+      console.clear();
+      log.info('Peer left. Waiting for new peer...');
+      log.info(`Share this agreeableKey with peers: ${agreeableKey}`);
+      messages.length = 0; // Clear messages
+      rl.pause();
+    } else {
+      messages.push(`>> Peer left: ${peerKey}`);
+      refreshDisplay();
+    }
   });
   
   room.on('message', async (m) => {

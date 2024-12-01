@@ -154,7 +154,7 @@ export const gatherExpectations = async (config) => {
   return expectations
 }
 
-export const validateParticipant = async (acceptance, extraInfo) => {
+export const validateParticipant = async (config, acceptance, extraInfo) => {
   // Show what the participant agreed to
   log.step('Participant Agreement Status:')
   note(

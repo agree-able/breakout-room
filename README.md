@@ -1,6 +1,7 @@
 # breakout-room
 
-A fully-featured implementation of [@agreeable-room/room](https://github.com/ryanramage/agreeable-room) demonstrating secure peer-to-peer chat rooms with identity verification. Perfect for studying how to build p2p applications or for direct use in your projects.
+A fully-featured implementation of [@agree-able/room](https://github.com/agree-able/room) demonstrating secure peer-to-peer chat rooms with identity verification. 
+Perfect for studying how to build p2p applications or for direct use in your projects.
 
 ## Quick Start
 
@@ -11,6 +12,8 @@ npx breakout-room
 The CLI includes an interactive menu system that guides you through all available options and configurations.
 
 ## Usage Modes
+
+Command-line switches are available to reduce the amount of interactive menu choices. You can provide enough to start the app automatically.
 
 ### 1. Start a Room Manager
 Create a hub for hosting multiple rooms with configurable:
@@ -32,8 +35,12 @@ Connect to an existing room using one of these methods:
 
 Example joining with domain:
 ```bash
-npx breakout-room --mode=join --domain=example.com
+npx breakout-room --mode=join --domain=example.com --hostProveWhoami=true --agree=true --autoValidate=true
 ```
+
+ - **hostProveWhoami** the host will show their keybase username and domain ownership (if available)
+ - **autoValidate** if the host proves username and and domain, dont prompt to enter room
+ - **agree** just agree to both the reason and rules of the room
 
 ### 3. Simple Room
 Quick setup for basic chat functionality without advanced features.

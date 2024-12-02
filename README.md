@@ -9,13 +9,13 @@ Perfect for studying how to build p2p applications or for direct use in your pro
 npx breakout-room
 ```
 
-start a host
+Start a host
 
 <p align="center">
   <img width="600" src="https://raw.githubusercontent.com/agree-able/.github/refs/heads/main/profile/assets/host.svg">
 </p>
 
-connect
+Join as a participant
 
 <p align="center">
   <img width="600" src="https://raw.githubusercontent.com/agree-able/.github/refs/heads/main/profile/assets/participant.svg">

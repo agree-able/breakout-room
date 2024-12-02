@@ -9,6 +9,19 @@ Perfect for studying how to build p2p applications or for direct use in your pro
 npx breakout-room
 ```
 
+start a host
+
+<p align="center">
+  <img width="600" src="https://raw.githubusercontent.com/agree-able/.github/refs/heads/main/profile/assets/host.svg">
+</p>
+
+connect
+
+<p align="center">
+  <img width="600" src="https://raw.githubusercontent.com/agree-able/.github/refs/heads/main/profile/assets/participant.svg">
+</p>
+
+
 The CLI includes an interactive menu system that guides you through all available options and configurations.
 
 ## Usage Modes
@@ -73,7 +86,7 @@ npx breakout-room --config=myroom.json
 
 ## Examples
 - [Basic CLI Implementation](cli.mjs)
-- [AI Bot Integration](https://github.com/ryanramage/breakout-room-bot)
+- [20 questions bot](https://github.com/agree-able/20-questions-bot) Example of its intended bot friendly integration
 
 ## Security Features
 - Keybase identity verification

@@ -70,6 +70,14 @@ Users can then connect using just your domain:
 npx breakout-room --domain=yourdomain.com
 ```
 
+## Keybase Verification
+
+To use keybase you need a username, and have added a pgp key that you have added to your verification chain. The private key you will need access to in order to sign some messages. 
+
+You can check if you public key is available at the url https://keybase.io/${keybaseUsername}/pgp_keys.asc
+
+If you are the host, and a participant does domain verification, you should also add the website to your verified chain using the TXT method.
+
 ## Configuration
 
 The CLI's menu system helps discover and configure all options including:

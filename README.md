@@ -72,13 +72,19 @@ npx breakout-room --domain=yourdomain.com
 
 ## Keybase Verification
 
-To use keybase you need 
- 
- - a username
- - added a pgp key to your verification chain 
- - access to your private key to sign some messages
- - your public key is available at the url https://keybase.io/${keybaseUsername}/pgp_keys.asc
- - as the host, add the domain (website) to your verified chain using the TXT method.
+Keybase integration provides cryptographic identity verification. To use this feature, you need:
+
+1. A Keybase account with:
+   - An active username
+   - A PGP key added to your verification chain
+   - Access to your private key for message signing
+   - Your public key accessible at: https://keybase.io/USERNAME/pgp_keys.asc
+
+2. For room hosts:
+   - Verify domain ownership through Keybase's DNS TXT verification method
+   - This allows participants to cryptographically verify both your identity and domain control
+
+The verification process happens automatically when enabled, ensuring secure identity verification without manual steps.
 
 ## Configuration
 

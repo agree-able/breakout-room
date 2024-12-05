@@ -5,12 +5,12 @@ import { handleInvite } from '@agree-able/invite'
 import readline from 'readline'
 import pc from 'picocolors'
 import { intro, outro, log, spinner } from '@clack/prompts'
-import { validateAndUpdateConfig, confirmRoomEnter, validateParticipant } from './userConfirmation.mjs'
+import { prompt, confirmRoomEnter, validateParticipant } from '@agree-able/room-config'
 
 const config = rc('breakout-room', {})
 
 async function run () {
-  await validateAndUpdateConfig(config)
+  await prompt(config)
   const _confirmRoomEnter = confirmRoomEnter.bind(null, config) // just so we can get the config
   const _validateParticipant = validateParticipant.bind(null, config)
   const { invite } = await handleInvite(config, _confirmRoomEnter)

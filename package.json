@@ -29,6 +29,7 @@
   "dependencies": {
     "@agree-able/invite": "^1.0.3",
     "@agree-able/room": "^4.0.1",
+    "@agree-able/room-config": "^1.0.0",
     "@agree-able/rpc": "^3.0.0",
     "@clack/prompts": "^0.8.2",
     "autobase": "^6.5.9",

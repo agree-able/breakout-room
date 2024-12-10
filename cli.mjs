@@ -15,7 +15,7 @@ async function run () {
   const _validateParticipant = validateParticipant.bind(null, config)
   const { invite } = await handleInvite(config, _confirmRoomEnter)
   if (invite) {
-    const room = new BreakoutRoom({ invite })
+    const room = new BreakoutRoom({ invite, ...config })
     await room.ready()
     room.installSIGHandlers() // handle shutdown signals
     onRoom(room)
@@ -57,8 +57,9 @@ async function onRoom (room, isHost) {
   })
 
   // Handle incoming messages
-  room.on('peerEntered', (peerKey) => {
-    messages.push(`>> Peer entered: ${peerKey}`)
+  room.on('peerEntered', (message) => {
+    const whoami = message.keybaseUsername ? `, keybase: ${message.keybaseUsername}` : ''
+    messages.push(`>> Peer entered: ${message.who.substring(0, 6)} ${whoami}`)
     refreshDisplay()
     if (isHost) {
       rl.resume()
@@ -71,14 +72,16 @@ async function onRoom (room, isHost) {
     rl.removeAllListeners('line')
     rl.on('line', async (input) => {
       if (input.toLowerCase() === '/quit') {
+        const transcript = await room.getTranscript()
+        console.log(transcript)
         await room.exit()
         rl.close()
         outro('Goodbye!')
         process.exit(0)
       }
 
+      const { type, signMessages, pk } = await room.message(input)
       messages.push(`[${pc.bold('You')}  ${pc.green(youKey)}] ${input}`)
-      room.message(input)
       refreshDisplay()
     })
   }
@@ -91,6 +94,8 @@ async function onRoom (room, isHost) {
       messages.length = 0 // Clear messages
       rl.pause()
       // Remove existing listeners to prevent duplicates
+      const transcript = await room.getTranscript()
+      console.log(transcript)
       rl.removeAllListeners('line')
     } else {
       messages.push(`>> Peer left: ${peerKey}`)

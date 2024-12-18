@@ -1,7 +1,9 @@
 # breakout-room
 
-A fully-featured implementation of [@agree-able/room](https://github.com/agree-able/room) demonstrating secure peer-to-peer chat rooms with identity verification. 
-Perfect for studying how to build p2p applications or for direct use in your projects.
+A fully-featured implementation of [@agree-able/room](https://github.com/agree-able/room) demonstrating secure peer-to-peer chat rooms with identity verification and signed receipts. 
+Perfect for testing and studying how to build p2p agent to agent communication.
+
+To how how you'd use it with actual agents, see the [20 questions bot](https://github.com/agree-able/20-questions-bot)
 
 ## Quick Start
 
